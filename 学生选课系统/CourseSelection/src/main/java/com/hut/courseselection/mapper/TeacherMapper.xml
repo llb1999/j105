@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hut.courseselection.mapper.TeacherMapper">
+
+    <resultMap id="teacherResultMap" type="com.hut.courseselection.bean.Teacher">
+        <id property="id" column="id"></id>
+        <result property="tea_id" column="tea_id"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+    </resultMap>
+
+    <resultMap id="teacherInfoResultMap" type="com.hut.courseselection.bean.Teacher">
+        <id property="id" column="id"></id>
+        <result property="tea_id" column="tea_id"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="age" column="age"></result>
+        <result property="college" column="college"></result>
+        <result property="professionalTitle" column="professionaltitle"></result>
+        <result property="phoneNumber" column="phonenumber"></result>
+    </resultMap>
+
+    <resultMap id="manageCourseResultMap" type="com.hut.courseselection.bean.Course">
+        <id property="id" column="id"></id>
+        <result property="teaName" column="teacher_name"/>
+        <result property="courseName" column="course_name"/>
+        <result property="courseScore" column="course_score"/>
+        <result property="courseTime" column="course_time"/>
+
+        <collection column="{courseName=course_name,teacherName=teacher_name}" select="com.hut.courseselection.mapper.StudentMapper.getByCourseNameAndTeacherName"
+                    ofType="com.hut.courseselection.bean.TeacherPageDisplayInfo_Student" property="studentList">
+        </collection>
+    </resultMap>
+
+    <resultMap id="AdminPageDisplayInfo_TeacherResultMap" type="com.hut.courseselection.bean.AdminPageDisplayInfo_Teacher">
+        <id property="id" column="id"></id>
+        <result property="tea_id" column="tea_id"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="age" column="age"></result>
+        <result property="college" column="college"></result>
+        <result property="professionalTitle" column="professionaltitle"></result>
+        <result property="phoneNumber" column="phonenumber"></result>
+
+        <collection column="username" select="com.hut.courseselection.mapper.CourseMapper.getByTeacherUsername"
+                    ofType="com.hut.courseselection.bean.Course" property="courseList">
+        </collection>
+    </resultMap>
+
+    <insert id="register" keyProperty="id" useGeneratedKeys="true">
+        insert into teacher (username,password) values (#{username},#{password})
+    </insert>
+
+    <insert id="addCourse" keyProperty="id" useGeneratedKeys="true">
+        insert into course (course_name,teacher_name,course_score,course_time) values (#{courseName},#{teacherName},#{courseScore},#{courseTime})
+    </insert>
+
+    <update id="updateStudentCourseScore">
+        update student_course set score = #{score} where student_name = #{studentName} and course_name = #{courseName}
+    </update>
+
+    <update id="updateSelfInfo">
+        update teacher set
+        username = #{username},password = #{password},age = #{age},
+        college = #{college},professionaltitle = #{professionalTitle},
+        phonenumber = #{phoneNumber}
+        where tea_id = #{tea_id}
+    </update>
+
+    <delete id="deleteCourse">
+        delete from course where course_name = #{courseName} and teacher_name = #{teacherName}
+    </delete>
+
+    <delete id="deleteStudentSelectCourse">
+        delete from student_course where course_name = #{courseName}
+    </delete>
+
+    <delete id="deleteStudentFromCourse">
+        delete from student_course where course_name = #{courseName} and student_name = #{studentName}
+    </delete>
+
+    <select id="login" resultMap="teacherResultMap">
+        select * from teacher where tea_id = #{tea_id} and password = #{password}
+    </select>
+
+    <select id="manageCourse" resultMap="manageCourseResultMap">
+        select * from course where teacher_name = #{teacherName} and course_name = #{courseName}
+    </select>
+
+    <select id="manageAllCourse" resultMap="manageCourseResultMap">
+        select * from course where teacher_name = #{teacherName}
+    </select>
+
+    <select id="getTeacherInfoByStuId" resultMap="teacherInfoResultMap">
+        select * from teacher where tea_id = #{tea_id}
+    </select>
+
+    <select id="getCourseByTeacherNameAndCourseName" resultType="com.hut.courseselection.bean.Course">
+        select * from course where course_name = #{courseName} and teacher_name = #{username}
+    </select>
+
+    <select id="displayTeacherCheckedCourse" resultMap="AdminPageDisplayInfo_TeacherResultMap">
+        select * from teacher where username = #{teacherName}
+    </select>
+</mapper>

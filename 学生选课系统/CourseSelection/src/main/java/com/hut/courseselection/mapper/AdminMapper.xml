@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hut.courseselection.mapper.AdminMapper">
+
+    <resultMap id="adminResultMap" type="com.hut.courseselection.bean.Admin">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+    </resultMap>
+    <resultMap id="studentResultMap" type="com.hut.courseselection.bean.Student">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="classNum" column="class"/>
+        <result property="phoneNumber" column="phonenumber"/>
+
+        <collection column="username" select="com.hut.courseselection.mapper.CourseMapper.getByStudentUsername"
+                    ofType="com.hut.courseselection.bean.StudentPageDisplayInfo_Course" property="courseList">
+        </collection>
+    </resultMap>
+    <resultMap id="teacherResultMap" type="com.hut.courseselection.bean.AdminPageDisplayInfo_Teacher">
+        <id property="id" column="id"/>
+        <result property="tea_id" column="tea_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="age" column="age"/>
+        <result property="college" column="college"/>
+        <result property="professionalTitle" column="professionaltitle"/>
+        <result property="phoneNumber" column="phonenumber"/>
+
+        <collection column="username" select="com.hut.courseselection.mapper.TeacherMapper.manageAllCourse"
+                    ofType="com.hut.courseselection.bean.Course" property="courseList">
+        </collection>
+    </resultMap>
+
+    <update id="updateStudentPassword">
+        update student set password = #{password} where username = #{username}
+    </update>
+    <update id="updateStudentCourseScore">
+        update student_course set score = #{score} where student_name = #{studentName} and course_name = #{courseName}
+    </update>
+    <update id="updateTeacherPassword">
+        update teacher set password = #{password} where username = #{username}
+    </update>
+    <delete id="deleteStudent">
+        delete from student where username = #{studentName}
+    </delete>
+    <delete id="deleteStudentCourse">
+        delete from student_course where student_name = #{studentName}
+    </delete>
+    <delete id="deleteTeacher">
+        delete from teacher where username = #{teacherName}
+    </delete>
+    <delete id="deleteTeacherCourse">
+        delete from course where teacher_name = #{teacherName}
+    </delete>
+
+    <select id="login" resultMap="adminResultMap">
+        select * from admin where username = #{username} and password = #{password}
+    </select>
+
+    <select id="getAllStudentInfo" resultMap="studentResultMap">
+        select * from student;
+    </select>
+
+    <select id="getAllTeacherInfo" resultMap="teacherResultMap">
+        select * from teacher;
+    </select>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hut.courseselection.mapper.CourseMapper">
+
+    <resultMap id="courseResultMap" type="com.hut.courseselection.bean.StudentPageDisplayInfo_Course">
+        <id column="id" property="id"></id>
+        <result column="course_name" property="courseName"/>
+        <result column="teacher_name" property="teaName"/>
+        <result column="score" property="score"/>
+        <result column="course_score" property="courseScore"/>
+        <result column="course_time" property="courseTime"/>
+    </resultMap>
+
+    <select id="getByStudentUsername" resultMap="courseResultMap">
+        select c.*,sc.*
+        from course c join student_course sc on c.course_name = sc.course_name AND c.teacher_name = sc.teacher_name
+        where sc.student_name = #{username};
+    </select>
+
+    <select id="getByTeacherUsername" resultMap="courseResultMap">
+        SELECT * FROM course WHERE teacher_name = #{username}
+    </select>
+
+</mapper>

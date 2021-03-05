@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hut.courseselection.mapper.StudentMapper">
+
+    <resultMap id="studentResultMap" type="com.hut.courseselection.bean.TeacherPageDisplayInfo_Student">
+        <id property="id" column="id"></id>
+        <result property="stu_id" column="stu_id"></result>
+        <result property="username" column="username"></result>
+        <result property="score" column="score"></result>
+    </resultMap>
+
+    <resultMap id="studentInfoResultMap" type="com.hut.courseselection.bean.Student">
+        <id property="id" column="id"></id>
+        <result property="stu_id" column="stu_id"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="age" column="age"></result>
+        <result property="classNum" column="class"></result>
+        <result property="college" column="college"></result>
+        <result property="phoneNumber" column="phonenumber"></result>
+
+    </resultMap>
+
+    <resultMap id="studentLoginResultMap" type="com.hut.courseselection.bean.Student">
+        <id property="id" column="id"></id>
+        <result property="stu_id" column="stu_id"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+    </resultMap>
+
+    <resultMap id="studentCourseResultMap" type="com.hut.courseselection.bean.Student">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="classNum" column="class"/>
+
+        <collection column="username" select="com.hut.courseselection.mapper.CourseMapper.getByStudentUsername"
+                    ofType="com.hut.courseselection.bean.StudentPageDisplayInfo_Course" property="courseList">
+        </collection>
+    </resultMap>
+
+    <insert id="register" keyProperty="id" useGeneratedKeys="true">
+        insert into student (username,password) values (#{username},#{password})
+    </insert>
+
+    <insert id="addCourse" keyProperty="id" useGeneratedKeys="true">
+        insert into student_course (student_name,course_name,teacher_name) values (#{studentName},#{courseName},#{courseTeacher})
+    </insert>
+
+    <update id="updateSelfInfo">
+        update student set
+        username = #{username},password = #{password},age = #{age},
+        class = #{classNum},college = #{college},phonenumber = #{phoneNumber}
+        where stu_id = #{stu_id}
+    </update>
+
+    <delete id="deleteCourse">
+        delete from student_course where student_name = #{studentName} and course_name = #{courseName} and teacher_name = #{teacherName}
+    </delete>
+
+    <select id="login" resultMap="studentLoginResultMap">
+        select * from student where stu_id= #{stu_id} and password = #{password}
+    </select>
+
+    <select id="displayStudentCheckedCourse" resultMap="studentCourseResultMap">
+        select * from student where username = #{studentName}
+    </select>
+
+    <select id="getByCourseNameAndTeacherName" resultMap="studentResultMap">
+        SELECT s.id,s.username,sc.score
+        FROM student s JOIN student_course sc ON s.username = sc.student_name
+        WHERE sc.course_name = #{courseName} and sc.teacher_name = #{teacherName}
+    </select>
+
+    <select id="displayAllCourse" resultMap="com.hut.courseselection.mapper.CourseMapper.courseResultMap">
+        SELECT * from course
+    </select>
+
+    <select id="getCourseByStudentNameAndCourseName" resultType="com.hut.courseselection.bean.Course">
+        select * from student_course where student_name = #{username} and course_name = #{courseName}
+    </select>
+
+    <select id="getStudentInfoByStuId" resultMap="studentInfoResultMap">
+        select * from student where stu_id = #{stu_id}
+    </select>
+
+
+</mapper>
